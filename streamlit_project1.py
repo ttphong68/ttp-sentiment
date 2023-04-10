@@ -40,6 +40,7 @@ df = pd.read_csv('data/Products_Shopee_comments_cleaned_ver01.csv')
 # df = pd.concat([df1, df2], axis=0)
 
 # Data pre - processing
+df.drop(['Unnamed: 0'],axis=1,inplace=True)
 # remove duplicate
 df.drop_duplicates(inplace=True)
 # remove missing values
@@ -121,61 +122,61 @@ st.subheader('Sentiment analysis of Vietnamese comments on Shopee')
 
 # st.video('https://www.youtube.com/watch?v=q3nSSZNOg38&list=PLFTWPHJsZXVVnckL0b3DYmHjjPiRB5mqX')
 
-menu = ['Overview', 'Build Model', 'New Prediction']
+menu = ['Tổng quan', 'Xây dựng mô hình', 'Dự đoán mới']
 choice = st.sidebar.selectbox('Menu', menu)
 
-if choice == 'Overview':
-    st.subheader('Overview')
+if choice == 'Tổng quan':
+    st.subheader('Tổng quan')
     
     st.write('''
-    This project is about sentiment analysis of Vietnamese comments on Shopee. 
-    The dataset is collected from Shopee website. 
-    The dataset contains 2 columns: rating and comment. 
-    The rating is from 1 to 5. 
-    The comment is the comment of customers after they buy products on Shopee. 
-    The goal of this project is to build a model to predict the sentiment of comments. 
-    The sentiment is positive or negative. 
+    Đây là dự án về phân tích cảm xúc của các bình luận của người Việt trên Shopee.
+    Bộ dữ liệu được thu thập từ trang web Shopee (Do Cô cung cấp).
+    Tập dữ liệu chứa 2 cột: xếp hạng và bình luận.
+    Thang đánh giá là từ 1 đến 5.
+    Cột Comment là nhận xét của khách hàng sau khi họ mua hàng trên Shopee.
+    Mục tiêu của dự án này là xây dựng một mô hình để dự đoán cảm xúc của các bình luận.
+    Cảm xúc tích cực hay tiêu cực.
     ''')
     st.write('''
-    The dataset has 2 classes: positive and negative. 
+    Bộ dữ liệu có 2 lớp: Tích cực và tiêu cực. 
     ''')
     st.write('''
-    The model is built with Logistic Regression and applying oversampling data:
-    - The model has 86% accuracy.
-    - The model has 94% precision for the positive class.
-    - The model has 85% recall for the positive class.
-    - The model has 73% precision for the negative class.
-    - The model has 88% recall for the negative class. 
+    Mô hình được xây dựng với Logistic Regression và sử dụng oversampling data:
+    - Mô hình có độ chính xác 87% ( Accuracy ).
+    - Mô hình có độ chính xác 94% ( precision ) cho lớp tích cực ( positive class ).
+    - Mô hình có độ chính xác 85% ( recall ) cho lớp tích cực ( positive class ).
+    - Mô hình có độ chính xác 71% ( precision ) cho lớp tiêu cực ( negative class ).
+    - Mô hình có độ chính xác 87% ( recall ) cho lớp tiêu cực ( negative class ). 
     ''')
-elif choice == 'Build Model':
-    st.subheader('Build Model')
-    st.write('#### Data Preprocessing')
-    st.write('##### Show data')
+elif choice == 'Xây dựng mô hình':
+    st.subheader('Xây dựng mô hình')
+    st.write('#### Tiền xử lý dữ liệu')
+    st.write('##### Hiển thị dữ liệu')
     st.table(df.head())
     # plot bar chart for sentiment
-    st.write('##### Bar chart for sentiment')
+    st.write('##### Biểu đồ Bar cho biểu thị tình cảm')
     fig, ax = plt.subplots(figsize=(10, 5))
     ax.bar(df['Sentiment'].value_counts().index, df['Sentiment'].value_counts().values)
     ax.set_xticks(df['Sentiment'].value_counts().index)
-    ax.set_xticklabels(['Negative', 'Positive'])
-    ax.set_ylabel('Number of comments')
-    ax.set_title('Bar chart for sentiment')
+    ax.set_xticklabels(['Tiêu cực', 'Tích cực'])
+    ax.set_ylabel('Số lượng bình luận')
+    ax.set_title('Biểu đồ Bar cho biểu thị tình cảm')
     st.pyplot(fig)
 
     # plot wordcloud for positive and negative comments
-    st.write('##### Wordcloud for positive comments')
+    st.write('##### Wordcloud Cho bình luận tích cực')
     fig, ax = plt.subplots(figsize=(10, 5))
     ax.imshow(WordCloud(width=800, height=400, background_color='white').generate(' '.join(df[df['Sentiment'] == 1]['comment'])))
     ax.axis('off')
     st.pyplot(fig)
 
-    st.write('##### Wordcloud for negative comments')
+    st.write('##### Wordcloud Cho bình luận tiêu cực')
     fig, ax = plt.subplots(figsize=(10, 5))
     ax.imshow(WordCloud(width=800, height=400, background_color='white').generate(' '.join(df[df['Sentiment'] == 0]['comment'])))
     ax.axis('off')
     st.pyplot(fig)
 
-    st.write('#### Build model and evaluation:')
+    st.write('#### Xây dựng mô hình và đánh giá:')
     st.write('##### Confusion matrix')
     st.table(cm)
     st.write('##### Classification report')
@@ -184,13 +185,13 @@ elif choice == 'Build Model':
     # show accuracy as percentage with 2 decimal places
     st.write(f'{accuracy_score(y_test, y_pred) * 100:.2f}%')
     
-elif choice == 'New Prediction':
-    st.subheader('New Prediction')
+elif choice == 'Dự đoán mới':
+    st.subheader('Dự đoán mới')
     st.write('''
-    Input a comment and the model will predict the sentiment of the comment. 
+    Nhập vào một bình luận và mô hình sẽ dự đoán tình cảm của bình luận. 
     ''')
-    comment = st.text_input('Input a comment')
-    if st.button('Predict'):
+    comment = st.text_input('Nhập vào một bình luận')
+    if st.button('Dự đoán'):
         if comment != '':
 
             # # Xử lý tiếng việt thô
@@ -208,8 +209,8 @@ elif choice == 'New Prediction':
             y_predict = model.predict(comment)
 
             if y_predict[0] == 1:
-                st.write('The sentiment of the comment is positive')
+                st.write('Tình cảm của bình luận là tích cực')
             else:
-                st.write('The sentiment of the comment is negative')
+                st.write('Tình cảm của bình luận là tiêu cực')
         else:
-            st.write('Please input a comment')
+            st.write('Nhập vào một bình luận')
