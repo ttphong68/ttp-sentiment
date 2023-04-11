@@ -25,19 +25,19 @@ from sklearn.metrics import confusion_matrix, classification_report, roc_auc_sco
 # !pip install import-ipynb
 import import_ipynb
 from Library_Functions import *
-import pickle
-
 #----------------------------------------------------------------------------------------------------
 # Part 1: Build project
-# load data
-print('Loading data.....')
-df = pd.read_csv('data/Products_Shopee_comments_cleaned_ver01.csv')
 
-# abspath1 = os.path.abspath('data/Products_Shopee_comments_cleaned_ver01_1.csv')
-# df1=pd.read_csv(abspath1,sep=',', encoding='utf-8')
-# abspath2 = os.path.abspath('data/Products_Shopee_comments_cleaned_ver01_2.csv')
-# df2=pd.read_csv(abspath2,sep=',', encoding='utf-8')
-# df = pd.concat([df1, df2], axis=0)
+# Load data
+print('Loading data.....')
+df = df()
+
+# Load model
+print('Loading model.....')
+# Đọc model LogisticRegression()
+model = load_model_Sentiment()
+# Đọc model CountVectorizer()
+cv = load_model_cv()
 
 # Data pre - processing
 df.drop(['Unnamed: 0'],axis=1,inplace=True)
@@ -45,16 +45,6 @@ df.drop(['Unnamed: 0'],axis=1,inplace=True)
 df.drop_duplicates(inplace=True)
 # remove missing values
 df.dropna(inplace=True)
-
-# Đọc model LogisticRegression()
-pkl_filename = "model/Sentiment_model_best.pkl"
-with open(pkl_filename, 'rb') as file:
-    model = pickle.load(file)
-
-# Đọc model CountVectorizer()
-filename = "model/cv_model.pkl"
-with open(filename, 'rb') as file:
-    cv = pickle.load(file)
 
 # split data into train and test
 print('Split data into train and test...........')

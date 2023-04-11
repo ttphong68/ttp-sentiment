@@ -29,9 +29,32 @@ from sklearn.metrics import accuracy_score, confusion_matrix, classification_rep
 # vẽ đường cong ROC
 from sklearn.metrics import roc_auc_score, roc_curve
 
+import streamlit as st
+import pickle
+
 import warnings
 warnings.filterwarnings("ignore")
-
+#---------------------------------------------------------------------------------------------
+@st.cache_data
+def df():
+    df = pd.read_csv('data/Products_Shopee_comments_cleaned_ver01.csv')
+    return df
+#---------------------------------------------------------------------------------------------
+@st.cache_data
+def load_model_Sentiment():
+    # Đọc model LogisticRegression()
+    pkl_filename = "model/Sentiment_model_best.pkl"
+    with open(pkl_filename, 'rb') as file:
+        model = pickle.load(file)
+    return model
+#---------------------------------------------------------------------------------------------
+@st.cache_data
+def load_model_cv():
+    filename = "model/cv_model.pkl"
+    with open(filename, 'rb') as file:
+        cv = pickle.load(file)
+    return cv
+#---------------------------------------------------------------------------------------------
 ## Hàm kiểm tra và tính số lượng, tỷ trọng outliers
 def check_outlier(col):
     Q1 = np.percentile(col, 25)
@@ -45,7 +68,7 @@ def check_outlier(col):
     print('# Number of upper outliers: ', highOutliers)
     print('# Number of lower outliers: ', lowOutliers)
     print('# Percentage of ouliers:    ', (highOutliers + lowOutliers)/col.shape[0])
-
+#---------------------------------------------------------------------------------------------
 ## Hàm remove outliers
 def remove_outlier(variable, data_param):
 # Detection
@@ -61,8 +84,7 @@ def remove_outlier(variable, data_param):
     data_param.drop(lower[0], inplace = True)
     data_param.reset_index(drop=True, inplace=True)
     return data_param
-
-
+#---------------------------------------------------------------------------------------------
 def process_text(text, emoji_dict, teen_dict, wrong_lst):
     document = text.lower()
     document = document.replace("’", '')
@@ -112,8 +134,7 @@ def process_text(text, emoji_dict, teen_dict, wrong_lst):
     document = regex.sub(r'\s+', ' ', document).strip()
     # ...
     return document
-
-
+#---------------------------------------------------------------------------------------------
 # Chuẩn hóa unicode tiếng việt
 def loaddicchar():
     uniChars = "àáảãạâầấẩẫậăằắẳẵặèéẻẽẹêềếểễệđìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵÀÁẢÃẠÂẦẤẨẪẬĂẰẮẲẴẶÈÉẺẼẸÊỀẾỂỄỆĐÌÍỈĨỊÒÓỎÕỌÔỒỐỔỖỘƠỜỚỞỠỢÙÚỦŨỤƯỪỨỬỮỰỲÝỶỸỴÂĂĐÔƠƯ"
@@ -127,15 +148,14 @@ def loaddicchar():
     for i in range(len(char1252)):
         dic[char1252[i]] = charutf8[i]
     return dic
-
-
+#---------------------------------------------------------------------------------------------
 # Đưa toàn bộ dữ liệu qua hàm này để chuẩn hóa lại
 def covert_unicode(txt):
     dicchar = loaddicchar()
     return regex.sub(
         r'à|á|ả|ã|ạ|ầ|ấ|ẩ|ẫ|ậ|ằ|ắ|ẳ|ẵ|ặ|è|é|ẻ|ẽ|ẹ|ề|ế|ể|ễ|ệ|ì|í|ỉ|ĩ|ị|ò|ó|ỏ|õ|ọ|ồ|ố|ổ|ỗ|ộ|ờ|ớ|ở|ỡ|ợ|ù|ú|ủ|ũ|ụ|ừ|ứ|ử|ữ|ự|ỳ|ý|ỷ|ỹ|ỵ|À|Á|Ả|Ã|Ạ|Ầ|Ấ|Ẩ|Ẫ|Ậ|Ằ|Ắ|Ẳ|Ẵ|Ặ|È|É|Ẻ|Ẽ|Ẹ|Ề|Ế|Ể|Ễ|Ệ|Ì|Í|Ỉ|Ĩ|Ị|Ò|Ó|Ỏ|Õ|Ọ|Ồ|Ố|Ổ|Ỗ|Ộ|Ờ|Ớ|Ở|Ỡ|Ợ|Ù|Ú|Ủ|Ũ|Ụ|Ừ|Ứ|Ử|Ữ|Ự|Ỳ|Ý|Ỷ|Ỹ|Ỵ',
         lambda x: dicchar[x.group()], txt)
-
+#---------------------------------------------------------------------------------------------
 def process_special_word(text):
     new_text = ''
     text_lst = text.split()
@@ -156,7 +176,7 @@ def process_special_word(text):
     else:
         new_text = text
     return new_text.strip()
-
+#---------------------------------------------------------------------------------------------
 def process_postag_thesea(text):
     new_document = ''
     for sentence in sent_tokenize(text):
@@ -169,7 +189,7 @@ def process_postag_thesea(text):
     ###### DEL excess blank space
     new_document = regex.sub(r'\s+', ' ', new_document).strip()
     return new_document
-
+#---------------------------------------------------------------------------------------------
 def remove_stopword(text, stopwords):
     ###### REMOVE stop words
     document = ' '.join('' if word in stopwords else word for word in text.split())
@@ -177,3 +197,4 @@ def remove_stopword(text, stopwords):
     ###### DEL excess blank space
     document = regex.sub(r'\s+', ' ', document).strip()
     return document
+#---------------------------------------------------------------------------------------------
