@@ -17,8 +17,6 @@ import streamlit as st
 from underthesea import word_tokenize
 import glob
 from wordcloud import WordCloud,STOPWORDS
-# from pandas_profiling import ProfileReport
-# import scipy
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, classification_report, roc_auc_score, roc_curve, auc
@@ -27,7 +25,7 @@ import import_ipynb
 from Library_Functions import *
 #----------------------------------------------------------------------------------------------------
 # Part 1: Build project
-
+#----------------------------------------------------------------------------------------------------
 # Load data
 print('Loading data.....')
 df = df()
@@ -100,10 +98,11 @@ file.close()
 file = open('files/vietnamese-stopwords.txt', 'r', encoding="utf8")
 stopwords_lst = file.read().split('\n')
 file.close()
-
+#----------------------------------------------------------------------------------------------------
 # Part 2: Build app
+#----------------------------------------------------------------------------------------------------
+# Overview
 
-# Title
 st.image('download.jpg')
 
 st.title("Trung tâm tin học - ĐH KHTN")
@@ -115,8 +114,60 @@ st.subheader('Sentiment analysis of Vietnamese comments on Shopee')
 menu = ['Tổng quan', 'Xây dựng mô hình', 'Dự đoán mới']
 choice = st.sidebar.selectbox('Menu', menu)
 
+#----------------------------------------------------------------------------------------------------
 if choice == 'Tổng quan':
-    st.subheader('Tổng quan')
+#----------------------------------------------------------------------------------------------------
+    st.subheader('1.Tổng quan')
+    st.write('''**Yêu cầu** : Xây dựng hệ thống hỗ trợ phân loại các phản hồi của khách hàng thành các nhóm : tích cực, tiêu cực trung tính dựa trên dữ liệu dạng văn bản.
+
+    **Mục tiêu/ Vấn đề** : Xây dựng mô hình dự đoán giúp người bán hàng có thể biết được những phản hồi nhanh chóng của khách hàng về sản phẩm hay dịch vụ của họ ( tích cực, tiêu cực hay trung tính ), điều này giúp cho người bán biết được tình hình kinh doanh, hiểu được ý kiến của khách hàng từ đó giúp họ cải thiện hơn trong dịch vụ, sản phẩm.
+
+    **Hướng dẫn chi tiết** :
+    Hiểu được vấn đề
+    Import các thư viện cần thiết và hiểu cách sử dụng
+    Đọc dữ liệu được cung cấp
+    Thực hiện EDA (Exploratory Data Analysis – Phân tích Khám phá Dữ liệu) cơ bản ( sử dụng Pandas Profifing Report )
+    Tiền xử lý dữ liệu : Làm sạch, tạo tính năng mới , lựa chọn tính năng cần thiết....
+    ''')
+    st.write('''
+    **Bước 1** : Business Understanding
+
+    **Bước 2** : Data Understanding ==> Giải quyết bài toán Sentiment analysis trong E-commerce bằng thuật toán nhóm Supervised Learning - Classification : Naive Bayes, KNN, Logictic Regression...
+
+    **Bước 3** : Data Preparation/ Prepare : Chuẩn hóa tiếng việt, viết các hàm xử lý dữ liệu thô...
+
+    **Xử lý tiếng việt** :
+
+    **1.Tiền xử lý dữ liệu thô** :
+
+        Chuyển text về chữ thường
+        Loại bỏ các ký tự đặc biệt nếu có
+        Thay thế emojicon/ teencode bằng text tương ứng
+        Thay thế một số punctuation và number bằng khoảng trắng
+        Thay thế các từ sai chính tả bằng khoảng trắng
+        Thay thế loạt khoảng trắng bằng một khoảng trắng
+    **2.Chuẩn hóa Unicode tiếng Việt** :
+
+    **3.Tokenizer văn bản tiếng Việt bằng thư viện underthesea** :
+
+    **4.Xóa các stopword tiếng Việt** :
+
+    **Bước 4&5: Modeling & Evaluation/ Analyze & Report**
+
+    **Xây dựng các Classification model dự đoán**
+
+        Naïve Bayes
+        Logistic Regression
+        Tree Algorithms…
+        Thực hiện/ đánh giá kết quả các Classification model
+
+        R-squared
+        Acc, precision, recall, f1,…
+    **Kết luận**
+    **Bước 6: Deployment & Feedback/ Act**
+
+        Đưa ra những cải tiến phù hợp để nâng cao sự hài lòng của khách hàng, thu hút sự chú ý của khách hàng mới
+    ''')
     
     st.write('''
     Đây là dự án về phân tích cảm xúc của các bình luận của người Việt trên Shopee.
@@ -138,7 +189,17 @@ if choice == 'Tổng quan':
     - Mô hình có độ chính xác 71% ( precision ) cho lớp tiêu cực ( negative class ).
     - Mô hình có độ chính xác 87% ( recall ) cho lớp tiêu cực ( negative class ). 
     ''')
+    st.subheader('2.Giáo viên hướng dẫn')
+    st.write('''
+    **Cô : Khuất Thụy Phương**
+    ''')
+    st.subheader('3.Học viên thực hiện')
+    st.write('''
+    **HV : Thái Thanh Phong - Nguyễn Hoàng Long**
+    ''')
+#----------------------------------------------------------------------------------------------------
 elif choice == 'Xây dựng mô hình':
+#----------------------------------------------------------------------------------------------------
     st.subheader('Xây dựng mô hình')
     st.write('#### Tiền xử lý dữ liệu')
     st.write('##### Hiển thị dữ liệu')
@@ -153,29 +214,66 @@ elif choice == 'Xây dựng mô hình':
     ax.set_title('Biểu đồ Bar cho biểu thị tình cảm')
     st.pyplot(fig)
 
-    # plot wordcloud for positive and negative comments
-    st.write('##### Wordcloud Cho bình luận tích cực')
-    fig, ax = plt.subplots(figsize=(10, 5))
-    ax.imshow(WordCloud(width=800, height=400, background_color='white').generate(' '.join(df[df['Sentiment'] == 1]['comment'])))
-    ax.axis('off')
-    st.pyplot(fig)
-
+    ## Negative
     st.write('##### Wordcloud Cho bình luận tiêu cực')
+    neg_ratings=df[df.Sentiment==0]
+    neg_words=[]
+    for t in neg_ratings.comment:
+        neg_words.append(t)
+    neg_text=pd.Series(neg_words).str.cat(sep=' ')
+    ## instantiate a wordcloud object
+    wc =WordCloud(
+        background_color='black',
+        max_words=200,
+        stopwords=stopwords_lst,
+        width=1600,height=800,
+        max_font_size=200)
+    wc.generate(neg_text)
+    ## Display the wordcloud
     fig, ax = plt.subplots(figsize=(10, 5))
-    ax.imshow(WordCloud(width=800, height=400, background_color='white').generate(' '.join(df[df['Sentiment'] == 0]['comment'])))
+    ax.imshow(wc,interpolation='bilinear')
     ax.axis('off')
-    st.pyplot(fig)
+    st.pyplot(fig)    
+
+    ## Positive
+    st.write('##### Wordcloud Cho bình luận tích cực')
+    pos_ratings=df[df.Sentiment==1]
+    pos_words=[]
+    for t in pos_ratings.comment:
+        pos_words.append(t)
+    pos_text=pd.Series(pos_words).str.cat(sep=' ')
+    ## instantiate a wordcloud object
+    wc =WordCloud(
+        background_color='black',
+        max_words=200,
+        stopwords=stopwords_lst,
+        width=1600,height=800,
+        max_font_size=200)
+    wc.generate(pos_text)
+    ## Display the wordcloud
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.imshow(wc,interpolation='bilinear')
+    ax.axis('off')
+    st.pyplot(fig)    
 
     st.write('#### Xây dựng mô hình và đánh giá:')
     st.write('##### Confusion matrix')
     st.table(cm)
     st.write('##### Classification report')
     st.table(classification_report(y_test, y_pred, output_dict=True))
+# Sữa lại đoại này dùm anh    
+    # fig, ax = plt.subplots(figsize=(10, 5))
+    # sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
+    # ax.xlabel('Predicted')
+    # ax.ylabel('Actual')
+    # st.pyplot(fig)    
+
     st.write('##### Accuracy')
     # show accuracy as percentage with 2 decimal places
     st.write(f'{accuracy_score(y_test, y_pred) * 100:.2f}%')
-    
+#----------------------------------------------------------------------------------------------------    
 elif choice == 'Dự đoán mới':
+#----------------------------------------------------------------------------------------------------
     st.subheader('Dự đoán mới')
     st.write('''
     Nhập vào một bình luận và mô hình sẽ dự đoán tình cảm của bình luận. 
