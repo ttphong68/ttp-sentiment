@@ -119,15 +119,16 @@ if choice == 'Tổng quan':
 #----------------------------------------------------------------------------------------------------
     st.subheader('1.Tổng quan')
     st.write('''**Yêu cầu** : Xây dựng hệ thống hỗ trợ phân loại các phản hồi của khách hàng thành các nhóm : tích cực, tiêu cực trung tính dựa trên dữ liệu dạng văn bản.
-
-    **Mục tiêu/ Vấn đề** : Xây dựng mô hình dự đoán giúp người bán hàng có thể biết được những phản hồi nhanh chóng của khách hàng về sản phẩm hay dịch vụ của họ ( tích cực, tiêu cực hay trung tính ), điều này giúp cho người bán biết được tình hình kinh doanh, hiểu được ý kiến của khách hàng từ đó giúp họ cải thiện hơn trong dịch vụ, sản phẩm.
-
+    ''')
+    st.write('''**Mục tiêu/ Vấn đề** : Xây dựng mô hình dự đoán giúp người bán hàng có thể biết được những phản hồi nhanh chóng của khách hàng về sản phẩm hay dịch vụ của họ ( tích cực, tiêu cực hay trung tính ), điều này giúp cho người bán biết được tình hình kinh doanh, hiểu được ý kiến của khách hàng từ đó giúp họ cải thiện hơn trong dịch vụ, sản phẩm.
+    ''')
+    st.write('''
     **Hướng dẫn chi tiết** :
-    Hiểu được vấn đề
-    Import các thư viện cần thiết và hiểu cách sử dụng
-    Đọc dữ liệu được cung cấp
-    Thực hiện EDA (Exploratory Data Analysis – Phân tích Khám phá Dữ liệu) cơ bản ( sử dụng Pandas Profifing Report )
-    Tiền xử lý dữ liệu : Làm sạch, tạo tính năng mới , lựa chọn tính năng cần thiết....
+    - Hiểu được vấn đề
+    - Import các thư viện cần thiết và hiểu cách sử dụng
+    - Đọc dữ liệu được cung cấp
+    - Thực hiện EDA (Exploratory Data Analysis – Phân tích Khám phá Dữ liệu) cơ bản ( sử dụng Pandas Profifing Report )
+    - Tiền xử lý dữ liệu : Làm sạch, tạo tính năng mới , lựa chọn tính năng cần thiết....
     ''')
     st.write('''
     **Bước 1** : Business Understanding
@@ -136,38 +137,36 @@ if choice == 'Tổng quan':
 
     **Bước 3** : Data Preparation/ Prepare : Chuẩn hóa tiếng việt, viết các hàm xử lý dữ liệu thô...
 
-    **Xử lý tiếng việt** :
+    **Xử lý tiếng việt** : ''')
 
-    **1.Tiền xử lý dữ liệu thô** :
+    st.write('''
+    **1.Tiền xử lý dữ liệu thô** :''')
 
-        Chuyển text về chữ thường
-        Loại bỏ các ký tự đặc biệt nếu có
-        Thay thế emojicon/ teencode bằng text tương ứng
-        Thay thế một số punctuation và number bằng khoảng trắng
-        Thay thế các từ sai chính tả bằng khoảng trắng
-        Thay thế loạt khoảng trắng bằng một khoảng trắng
-    **2.Chuẩn hóa Unicode tiếng Việt** :
-
-    **3.Tokenizer văn bản tiếng Việt bằng thư viện underthesea** :
-
-    **4.Xóa các stopword tiếng Việt** :
-
-    **Bước 4&5: Modeling & Evaluation/ Analyze & Report**
-
-    **Xây dựng các Classification model dự đoán**
-
-        Naïve Bayes
-        Logistic Regression
-        Tree Algorithms…
-        Thực hiện/ đánh giá kết quả các Classification model
-
-        R-squared
-        Acc, precision, recall, f1,…
-    **Kết luận**
-    **Bước 6: Deployment & Feedback/ Act**
-
-        Đưa ra những cải tiến phù hợp để nâng cao sự hài lòng của khách hàng, thu hút sự chú ý của khách hàng mới
-    ''')
+    st.write('''
+    - Chuyển text về chữ thường
+    - Loại bỏ các ký tự đặc biệt nếu có
+    - Thay thế emojicon/ teencode bằng text tương ứng
+    - Thay thế một số punctuation và number bằng khoảng trắng
+    - Thay thế các từ sai chính tả bằng khoảng trắng
+    - Thay thế loạt khoảng trắng bằng một khoảng trắng''')
+    
+    st.write('''**2.Chuẩn hóa Unicode tiếng Việt** :''')
+    st.write('''**3.Tokenizer văn bản tiếng Việt bằng thư viện underthesea** :''')
+    st.write('''**4.Xóa các stopword tiếng Việt** :''')
+    st.write('''**Bước 4&5: Modeling & Evaluation/ Analyze & Report**''')
+    st.write('''**Xây dựng các Classification model dự đoán**''')
+    
+    st.write('''
+    - Naïve Bayes\n
+    - Logistic Regression\n
+    - Tree Algorithms…\n
+    - Thực hiện/ đánh giá kết quả các Classification model\n
+    - R-squared\n
+    - Acc, precision, recall, f1,…''')
+    
+    st.write('''**Kết luận**''')
+    st.write('''**Bước 6: Deployment & Feedback/ Act**''')
+    st.write('''Đưa ra những cải tiến phù hợp để nâng cao sự hài lòng của khách hàng, thu hút sự chú ý của khách hàng mới''')
     
     st.write('''
     Đây là dự án về phân tích cảm xúc của các bình luận của người Việt trên Shopee.
@@ -191,7 +190,7 @@ if choice == 'Tổng quan':
     ''')
     st.subheader('2.Giáo viên hướng dẫn')
     st.write('''
-    **Cô : Khuất Thụy Phương**
+    **Cô : Khuất Thùy Phương**
     ''')
     st.subheader('3.Học viên thực hiện')
     st.write('''
