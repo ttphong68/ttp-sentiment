@@ -258,15 +258,14 @@ elif choice == 'Xây dựng mô hình':
     st.write('#### Xây dựng mô hình và đánh giá:')
     st.write('##### Confusion matrix')
     st.table(cm)
+
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax = sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
+    st.pyplot(fig)    
+
     st.write('##### Classification report')
     st.table(classification_report(y_test, y_pred, output_dict=True))
-# Sữa lại đoại này dùm anh    
-    # fig, ax = plt.subplots(figsize=(10, 5))
-    # sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
-    # ax.xlabel('Predicted')
-    # ax.ylabel('Actual')
-    # st.pyplot(fig)    
-
+  
     st.write('##### Accuracy')
     # show accuracy as percentage with 2 decimal places
     st.write(f'{accuracy_score(y_test, y_pred) * 100:.2f}%')
@@ -277,27 +276,35 @@ elif choice == 'Dự đoán mới':
     st.write('''
     Nhập vào một bình luận và mô hình sẽ dự đoán tình cảm của bình luận. 
     ''')
-    comment = st.text_input('Nhập vào một bình luận')
-    if st.button('Dự đoán'):
-        if comment != '':
+    menu = ["Nhập bình luận", "Tải tệp Excel", "Tải tệp CSV"]
+    choice = st.selectbox("Menu",menu)
+    if choice == "Nhập bình luận":
+        comment = st.text_input('Nhập vào một bình luận')
+        if st.button('Dự đoán'):
+            if comment != '':
 
-            # # Xử lý tiếng việt thô
-            comment = process_text(comment, emoji_dict, teen_dict, wrong_lst)
-            # Chuẩn hóa unicode tiếng việt
-            comment = covert_unicode(comment)
-            # Kí tự đặc biệt
-            comment = process_special_word(comment)
-            # postag_thesea
-            comment = process_postag_thesea(comment)
-            #  remove stopword vietnames
-            comment = remove_stopword(comment, stopwords_lst)
+                # # Xử lý tiếng việt thô
+                comment = process_text(comment, emoji_dict, teen_dict, wrong_lst)
+                # Chuẩn hóa unicode tiếng việt
+                comment = covert_unicode(comment)
+                # Kí tự đặc biệt
+                comment = process_special_word(comment)
+                # postag_thesea
+                comment = process_postag_thesea(comment)
+                #  remove stopword vietnames
+                comment = remove_stopword(comment, stopwords_lst)
 
-            comment = cv.transform([comment])
-            y_predict = model.predict(comment)
+                comment = cv.transform([comment])
+                y_predict = model.predict(comment)
 
-            if y_predict[0] == 1:
-                st.write('Tình cảm của bình luận là tích cực')
+                if y_predict[0] == 1:
+                    st.write('Tình cảm của bình luận là tích cực')
+                else:
+                    st.write('Tình cảm của bình luận là tiêu cực')
             else:
-                st.write('Tình cảm của bình luận là tiêu cực')
-        else:
-            st.write('Nhập vào một bình luận')
+                st.write('Nhập vào một bình luận')
+    elif choice == "Tải tệp Excel":
+        st.write('Bạn chọn upload excel')
+    else :
+        st.write('Bạn chọn upload csv')
+
