@@ -525,7 +525,7 @@ elif choice == 'Dự đoán mới':
         st.write('Bạn chọn Bình luận bằng giọng nói')
 
         path = ChromeDriverManager().install()
-        wikipedia.set_lang("vi")
+        # wikipedia.set_lang("vi")
 
         while True:
             try:
