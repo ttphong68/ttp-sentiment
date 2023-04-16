@@ -10,3 +10,10 @@ demoji
 pyvi
 emoji
 imblearn
+openai
+youtube_search
+webdriver_manager
+selenium
+playsound
+gtts
+speech_recognition

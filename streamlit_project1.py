@@ -27,8 +27,6 @@ import import_ipynb
 from Library_Functions import *
 #----------------------------------------------------------------------------------------------------
 # Support voice
-# from Speech_To_Text import speech_to_text
-# from Text_To_Speech import text_to_speech
 import time
 import sys
 import ctypes
@@ -40,16 +38,16 @@ import smtplib
 import requests
 import urllib
 import urllib.request as urllib2
-# from selenium import webdriver
-# from selenium.webdriver.common.keys import Keys
-# from webdriver_manager.chrome import ChromeDriverManager
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from webdriver_manager.chrome import ChromeDriverManager
 from time import strftime
-# from youtube_search import YoutubeSearch
+from youtube_search import YoutubeSearch
 
 #----------------------------------------------------------------------------------------------------
 # 1. Phần chatGPT
 
-!pip install openai
+# !pip install openai
 import openai
 # link tạo API Key đó https://beta.openai.com/account/api-keys
 openai.organization = 'org-Vf0cOHTHl3VyD7bUQSqDmglv'
