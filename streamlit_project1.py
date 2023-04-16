@@ -144,38 +144,38 @@ def text_transform(comment):
     comment = remove_stopword(comment, stopwords_lst)
     return comment 
 ## voice
-#------------------------------------------------------------------------------------------------------------------
-def dung():
-    text_to_speech("Hẹn gặp lại bạn sau!")
-#------------------------------------------------------------------------------------------------------------------
-def nhan_text():
-    for i in range(3):
-        st.write('Mời bạn nói: ')
-        text = speech_to_text()
-        if text:
-            return text.lower()
-        elif i < 2:
-            speech_to_text("Tôi không nghe rõ. Bạn nói lại được không!")
-    time.sleep(2)
-    dung()
-    return 0
-#------------------------------------------------------------------------------------------------------------------
-def chatGPT(text):
-    # List questions
-    questions = [text]
-    for question in questions:
-        print('\r\n' + question)
-        response = openai.Completion.create(
-            model="text-davinci-003",
-            prompt=question,
-            temperature=0,
-            max_tokens=512,
-            top_p=1.0,
-            frequency_penalty=0.0,
-            presence_penalty=0.0
-        )
-        print(' => ' + response.choices[0].text[2:])
-        return response.choices[0].text[2:]
+# #------------------------------------------------------------------------------------------------------------------
+# def dung():
+#     text_to_speech("Hẹn gặp lại bạn sau!")
+# #------------------------------------------------------------------------------------------------------------------
+# def nhan_text():
+#     for i in range(3):
+#         st.write('Mời bạn nói: ')
+#         text = speech_to_text()
+#         if text:
+#             return text.lower()
+#         elif i < 2:
+#             speech_to_text("Tôi không nghe rõ. Bạn nói lại được không!")
+#     time.sleep(2)
+#     dung()
+#     return 0
+# #------------------------------------------------------------------------------------------------------------------
+# def chatGPT(text):
+#     # List questions
+#     questions = [text]
+#     for question in questions:
+#         print('\r\n' + question)
+#         response = openai.Completion.create(
+#             model="text-davinci-003",
+#             prompt=question,
+#             temperature=0,
+#             max_tokens=512,
+#             top_p=1.0,
+#             frequency_penalty=0.0,
+#             presence_penalty=0.0
+#         )
+#         print(' => ' + response.choices[0].text[2:])
+#         return response.choices[0].text[2:]
 
 
 ## end voice
@@ -521,59 +521,59 @@ elif choice == 'Dự đoán mới':
                 df_after_predict.to_csv(output, index=False)
                 output.seek(0)
                 st.download_button('Download', data=output, file_name='result_csv.csv', mime='text/csv')
-    elif choice == "Bình luận bằng giọng nói" :
-        st.write('Bạn chọn Bình luận bằng giọng nói')
+    # elif choice == "Bình luận bằng giọng nói" :
+    #     st.write('Bạn chọn Bình luận bằng giọng nói')
 
-        path = ChromeDriverManager().install()
-        # wikipedia.set_lang("vi")
+    #     path = ChromeDriverManager().install()
+    #     # wikipedia.set_lang("vi")
 
-        while True:
-            try:
-                text = nhan_text()
-            except:
-                text = ""
+    #     while True:
+    #         try:
+    #             text = nhan_text()
+    #         except:
+    #             text = ""
 
-            if text == "":
-                voice = "bạn muốn nói gì với tôi"
-                text_to_speech(voice)
-            elif "tên gì" in text:
-                voice = "tôi tên là trợ lý ảo"
-                text_to_speech(voice)
-            elif "là ai" in text:
-                voice = "tôi là trợ lý ảo của anh Phong"
-                text_to_speech(voice)
-            elif "bye" in text or "thoát" in text or "dừng" in text or "tạm biệt" in text or "ngủ thôi" in text:
-                st.write('Hẹn gặp lại nạn sau')
-                dung()
-                break
-            else:
-                st.write('Câu bình luận của bạn :'+text)
-                text = text_transform(text)
-                text = cv.transform([text])
-                y_predict = model.predict(text)
+    #         if text == "":
+    #             voice = "bạn muốn nói gì với tôi"
+    #             text_to_speech(voice)
+    #         elif "tên gì" in text:
+    #             voice = "tôi tên là trợ lý ảo"
+    #             text_to_speech(voice)
+    #         elif "là ai" in text:
+    #             voice = "tôi là trợ lý ảo của anh Phong"
+    #             text_to_speech(voice)
+    #         elif "bye" in text or "thoát" in text or "dừng" in text or "tạm biệt" in text or "ngủ thôi" in text:
+    #             st.write('Hẹn gặp lại nạn sau')
+    #             dung()
+    #             break
+    #         else:
+    #             st.write('Câu bình luận của bạn :'+text)
+    #             text = text_transform(text)
+    #             text = cv.transform([text])
+    #             y_predict = model.predict(text)
 
-                if y_predict[0] == 1:
-                    sentiment = 'Tình cảm của bình luận là tích cực'
-                    st.write(sentiment)
-                else:
-                    sentiment = 'Tình cảm của bình luận là tiêu cực'
-                    st.write(sentiment)
+    #             if y_predict[0] == 1:
+    #                 sentiment = 'Tình cảm của bình luận là tích cực'
+    #                 st.write(sentiment)
+    #             else:
+    #                 sentiment = 'Tình cảm của bình luận là tiêu cực'
+    #                 st.write(sentiment)
 
-                text_to_speech(sentiment)
-    else:
-        path = ChromeDriverManager().install()
-        wikipedia.set_lang("vi")
-        while True:
-            try:
-                text = nhan_text()
-            except:
-                text = ""
-            if text == "":
-                voice = "bạn muốn nói gì với chatGPT"
-                text_to_speech(voice)
-            else:
-                st.write('Bạn muốn hỏi gì với chatGPT')
-                st.write('Câu hỏi của bạn cho ChatGPT :' + text)
-                voice = chatGPT(text)
-                st.write('ChatGPT trả lời :' + voice)
-                text_to_speech(voice)
+    #             text_to_speech(sentiment)
+    # else:
+    #     path = ChromeDriverManager().install()
+    #     # wikipedia.set_lang("vi")
+    #     while True:
+    #         try:
+    #             text = nhan_text()
+    #         except:
+    #             text = ""
+    #         if text == "":
+    #             voice = "bạn muốn nói gì với chatGPT"
+    #             text_to_speech(voice)
+    #         else:
+    #             st.write('Bạn muốn hỏi gì với chatGPT')
+    #             st.write('Câu hỏi của bạn cho ChatGPT :' + text)
+    #             voice = chatGPT(text)
+    #             st.write('ChatGPT trả lời :' + voice)
+    #             text_to_speech(voice)
