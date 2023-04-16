@@ -5,8 +5,7 @@ streamlit
 underthesea
 wordcloud
 import_ipynb
-statsmodels
-speech_recognition
+SpeechRecognition
 openai
 youtube_search
 webdriver_manager
