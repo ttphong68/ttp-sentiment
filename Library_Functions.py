@@ -33,7 +33,7 @@ import streamlit as st
 import pickle
 # import speech_recognition as sr
 # from gtts import gTTS
-import playsound
+# import playsound
 from datetime import date,datetime
 import datetime
 from time import strftime
