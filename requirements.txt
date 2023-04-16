@@ -7,7 +7,6 @@ wordcloud
 import_ipynb
 statsmodels
 demoji	
-pyvi
 speech_recognition
 openai
 youtube_search
