@@ -32,7 +32,7 @@ from sklearn.metrics import roc_auc_score, roc_curve
 import streamlit as st
 import pickle
 # import speech_recognition as sr
-from gtts import gTTS
+# from gtts import gTTS
 import playsound
 from datetime import date,datetime
 import datetime
