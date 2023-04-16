@@ -12,7 +12,9 @@ import matplotlib.pyplot as plt
 import re
 import os
 import datetime
+from datetime import date,datetime
 import streamlit as st
+import io
 
 from underthesea import word_tokenize
 import glob
@@ -23,6 +25,38 @@ from sklearn.metrics import confusion_matrix, classification_report, roc_auc_sco
 # !pip install import-ipynb
 import import_ipynb
 from Library_Functions import *
+#----------------------------------------------------------------------------------------------------
+# Support voice
+# from Speech_To_Text import speech_to_text
+# from Text_To_Speech import text_to_speech
+import time
+import sys
+import ctypes
+import wikipedia
+import datetime
+import json
+import re
+import webbrowser
+import smtplib
+import requests
+import urllib
+import urllib.request as urllib2
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from webdriver_manager.chrome import ChromeDriverManager
+from time import strftime
+from youtube_search import YoutubeSearch
+
+#----------------------------------------------------------------------------------------------------
+# 1. Phần chatGPT
+
+#!pip install openai
+import openai
+# link tạo API Key đó https://beta.openai.com/account/api-keys
+openai.organization = 'org-Vf0cOHTHl3VyD7bUQSqDmglv'
+# link lấy Organization ID https://beta.openai.com/account/org-settings
+openai.api_key = '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'
+
 #----------------------------------------------------------------------------------------------------
 # Part 1: Build project
 #----------------------------------------------------------------------------------------------------
@@ -98,6 +132,58 @@ file.close()
 file = open('files/vietnamese-stopwords.txt', 'r', encoding="utf8")
 stopwords_lst = file.read().split('\n')
 file.close()
+
+#----------------------------------------------------------------------------------------------------
+def text_transform(comment):
+    # # Xử lý tiếng việt thô
+    comment = process_text(comment, emoji_dict, teen_dict, wrong_lst)
+    # Chuẩn hóa unicode tiếng việt
+    comment = covert_unicode(comment)
+    # Kí tự đặc biệt
+    comment = process_special_word(comment)
+    # postag_thesea
+    comment = process_postag_thesea(comment)
+    #  remove stopword vietnames
+    comment = remove_stopword(comment, stopwords_lst)
+    return comment 
+## voice
+#------------------------------------------------------------------------------------------------------------------
+def dung():
+    text_to_speech("Hẹn gặp lại bạn sau!")
+#------------------------------------------------------------------------------------------------------------------
+def nhan_text():
+    for i in range(3):
+        st.write('Mời bạn nói: ')
+        text = speech_to_text()
+        if text:
+            return text.lower()
+        elif i < 2:
+            speech_to_text("Tôi không nghe rõ. Bạn nói lại được không!")
+    time.sleep(2)
+    dung()
+    return 0
+#------------------------------------------------------------------------------------------------------------------
+def chatGPT(text):
+    # List questions
+    questions = [text]
+    for question in questions:
+        print('\r\n' + question)
+        response = openai.Completion.create(
+            model="text-davinci-003",
+            prompt=question,
+            temperature=0,
+            max_tokens=512,
+            top_p=1.0,
+            frequency_penalty=0.0,
+            presence_penalty=0.0
+        )
+        print(' => ' + response.choices[0].text[2:])
+        return response.choices[0].text[2:]
+
+
+## end voice
+#------------------------------------------------------------------------------------------------------------------
+
 #----------------------------------------------------------------------------------------------------
 # Part 2: Build app
 #----------------------------------------------------------------------------------------------------
@@ -276,24 +362,14 @@ elif choice == 'Dự đoán mới':
     st.write('''
     Nhập vào một bình luận và mô hình sẽ dự đoán tình cảm của bình luận. 
     ''')
+    # menu = ["Nhập bình luận", "Tải tệp Excel", "Tải tệp CSV", "Bình luận bằng giọng nói", "Nói chuyện với chatGPT"]
     menu = ["Nhập bình luận", "Tải tệp Excel", "Tải tệp CSV"]
     choice = st.selectbox("Menu",menu)
     if choice == "Nhập bình luận":
         comment = st.text_input('Nhập vào một bình luận')
         if st.button('Dự đoán'):
             if comment != '':
-
-                # # Xử lý tiếng việt thô
-                comment = process_text(comment, emoji_dict, teen_dict, wrong_lst)
-                # Chuẩn hóa unicode tiếng việt
-                comment = covert_unicode(comment)
-                # Kí tự đặc biệt
-                comment = process_special_word(comment)
-                # postag_thesea
-                comment = process_postag_thesea(comment)
-                #  remove stopword vietnames
-                comment = remove_stopword(comment, stopwords_lst)
-
+                comment = text_transform(comment)
                 comment = cv.transform([comment])
                 y_predict = model.predict(comment)
 
@@ -305,6 +381,202 @@ elif choice == 'Dự đoán mới':
                 st.write('Nhập vào một bình luận')
     elif choice == "Tải tệp Excel":
         st.write('Bạn chọn upload excel')
-    else :
-        st.write('Bạn chọn upload csv')
+        uploaded_file = st.file_uploader("Bạn vui lòng chọn file: ")
+        if uploaded_file is not None:
+            # check file type not excel
+            if uploaded_file.name.split('.')[-1] != 'xlsx':
+                st.write('File không đúng định dạng, vui lòng chọn file excel')
 
+            elif uploaded_file.name.split('.')[-1] == 'xlsx':
+
+                # load data csv
+                df_upload = pd.read_excel(uploaded_file)
+
+                # predict sentiment of review
+                # list result
+                list_result = []
+                for i in range(len(df_upload)):
+                    comment = df_upload['review_text'][i]
+                    comment = text_transform(comment)
+                    comment = cv.transform([comment])
+                    y_predict = model.predict(comment)
+                    list_result.append(y_predict[0])
+
+                # apppend list result to dataframe
+                df_upload['sentiment'] = list_result
+                df_after_predict = df_upload.copy()
+                # change sentiment to string
+                y_class = {0: 'Tình cảm của bình luận là tiêu cực', 1: 'Tình cảm của bình luận là tích cực'}
+                df_after_predict['sentiment'] = [y_class[i] for i in df_after_predict.sentiment]
+
+                # show table result
+                st.subheader("Result & Statistics :")
+                # get 5 first row
+                st.write("5 bình luận đầu tiên: ")
+                st.table(df_after_predict.iloc[:, [0, 1]].head())
+                # st.table(df_after_predict.iloc[:,[0,1]])
+
+                # show wordcloud
+                st.subheader("Biểu đồ Wordcloud trích xuất đặc trưng theo nhóm sentiment: ")
+                cmt0 = df_after_predict[df_after_predict['sentiment'] == 'Tình cảm của bình luận là tiêu cực']
+                cmt1 = df_after_predict[df_after_predict['sentiment'] == 'Tình cảm của bình luận là tích cực']
+                cmt0 = cmt0['review_text'].str.cat(sep=' ')
+                cmt1 = cmt1['review_text'].str.cat(sep=' ')
+                wc0 = WordCloud(background_color='black', max_words=200, stopwords=stopwords_lst, width=1600,
+                                height=800, max_font_size=200)
+                wc0.generate(cmt0)
+                wc1 = WordCloud(background_color='black', max_words=200, stopwords=stopwords_lst, width=1600,
+                                height=800, max_font_size=200)
+                wc1.generate(cmt1)
+                fig, ax = plt.subplots(1, 2, figsize=(20, 10))
+                ax[0].imshow(wc0, interpolation='bilinear')
+                ax[0].axis('off')
+                ax[0].set_title('Tình cảm của bình luận là tiêu cực')
+                ax[1].imshow(wc1, interpolation='bilinear')
+                ax[1].axis('off')
+                ax[1].set_title('Tình cảm của bình luận là tích cực')
+                st.pyplot(fig)
+
+                # show plot bar chart of sentiment
+                st.subheader("Biểu đồ cột thể hiện số lượng bình luận theo nhóm sentiment: ")
+                fig, ax = plt.subplots(figsize=(10, 5))
+                ax = sns.countplot(x='sentiment', data=df_after_predict)
+                st.pyplot(fig)
+
+                # download file excel
+                st.subheader("Tải tệp excel kết quả dự đoán: ")
+                output = io.BytesIO()
+                writer = pd.ExcelWriter(output)
+                df_after_predict.to_excel(writer, sheet_name='Sheet1', index=False)
+                writer.save()
+                output.seek(0)
+
+                st.download_button('Download', data=output, file_name='result_excel.xlsx',
+                                   mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
+    elif choice == "Tải tệp CSV" :
+        st.write('Bạn chọn upload csv')
+        uploaded_file = st.file_uploader("Bạn vui lòng chọn file: ")
+        if uploaded_file is not None:
+            # check file type if not csv
+            if uploaded_file.name.split('.')[-1] != 'csv':
+                st.write('File không đúng định dạng, vui lòng chọn file csv')
+            elif uploaded_file.name.split('.')[-1] == 'csv':
+
+                # load data csv
+                df_upload = pd.read_csv(uploaded_file)
+                df_upload.drop('Unnamed: 0', axis=1, inplace=True)
+
+                # predict sentiment of review
+                # list result
+                list_result = []
+                for i in range(len(df_upload)):
+                    comment = df_upload['review_text'][i]
+                    comment = text_transform(comment)
+                    comment = cv.transform([comment])
+                    y_predict = model.predict(comment)
+                    list_result.append(y_predict[0])
+
+                # apppend list result to dataframe
+                df_upload['sentiment'] = list_result
+                df_after_predict = df_upload.copy()
+                # change sentiment to string
+                y_class = {0: 'Tình cảm của bình luận là tiêu cực', 1: 'Tình cảm của bình luận là tích cực'}
+                df_after_predict['sentiment'] = [y_class[i] for i in df_after_predict.sentiment]
+
+                # show table result
+                st.subheader("Result & Statistics :")
+                # get 5 first row
+                st.write("5 bình luận đầu tiên: ")
+                st.table(df_after_predict.iloc[:, [0, 1]].head())
+                # st.table(df_after_predict.iloc[:,[0,1]])
+
+                # show wordcloud
+                st.subheader("Biểu đồ Wordcloud trích xuất đặc trưng theo nhóm sentiment: ")
+                cmt0 = df_after_predict[df_after_predict['sentiment'] == 'Tình cảm của bình luận là tiêu cực']
+                cmt1 = df_after_predict[df_after_predict['sentiment'] == 'Tình cảm của bình luận là tích cực']
+                cmt0 = cmt0['review_text'].str.cat(sep=' ')
+                cmt1 = cmt1['review_text'].str.cat(sep=' ')
+                wc0 = WordCloud(background_color='black', max_words=200, stopwords=stopwords_lst, width=1600,
+                                height=800, max_font_size=200)
+                wc0.generate(cmt0)
+                wc1 = WordCloud(background_color='black', max_words=200, stopwords=stopwords_lst, width=1600,
+                                height=800, max_font_size=200)
+                wc1.generate(cmt1)
+                fig, ax = plt.subplots(1, 2, figsize=(20, 10))
+                ax[0].imshow(wc0, interpolation='bilinear')
+                ax[0].axis('off')
+                ax[0].set_title('Tình cảm của bình luận là tiêu cực')
+                ax[1].imshow(wc1, interpolation='bilinear')
+                ax[1].axis('off')
+                ax[1].set_title('Tình cảm của bình luận là tích cực')
+                st.pyplot(fig)
+
+                # show plot bar chart of sentiment
+                st.subheader("Biểu đồ cột thể hiện số lượng bình luận theo nhóm sentiment: ")
+                fig, ax = plt.subplots(figsize=(10, 5))
+                ax = sns.countplot(x='sentiment', data=df_after_predict)
+                st.pyplot(fig)
+
+                # download file csv
+                st.subheader("Tải tệp csv kết quả dự đoán: ")
+                output = io.BytesIO()
+                df_after_predict.to_csv(output, index=False)
+                output.seek(0)
+                st.download_button('Download', data=output, file_name='result_csv.csv', mime='text/csv')
+    elif choice == "Bình luận bằng giọng nói" :
+        st.write('Bạn chọn Bình luận bằng giọng nói')
+
+        path = ChromeDriverManager().install()
+        wikipedia.set_lang("vi")
+
+        while True:
+            try:
+                text = nhan_text()
+            except:
+                text = ""
+
+            if text == "":
+                voice = "bạn muốn nói gì với tôi"
+                text_to_speech(voice)
+            elif "tên gì" in text:
+                voice = "tôi tên là trợ lý ảo"
+                text_to_speech(voice)
+            elif "là ai" in text:
+                voice = "tôi là trợ lý ảo của anh Phong"
+                text_to_speech(voice)
+            elif "bye" in text or "thoát" in text or "dừng" in text or "tạm biệt" in text or "ngủ thôi" in text:
+                st.write('Hẹn gặp lại nạn sau')
+                dung()
+                break
+            else:
+                st.write('Câu bình luận của bạn :'+text)
+                text = text_transform(text)
+                text = cv.transform([text])
+                y_predict = model.predict(text)
+
+                if y_predict[0] == 1:
+                    sentiment = 'Tình cảm của bình luận là tích cực'
+                    st.write(sentiment)
+                else:
+                    sentiment = 'Tình cảm của bình luận là tiêu cực'
+                    st.write(sentiment)
+
+                text_to_speech(sentiment)
+    else:
+        path = ChromeDriverManager().install()
+        wikipedia.set_lang("vi")
+        while True:
+            try:
+                text = nhan_text()
+            except:
+                text = ""
+            if text == "":
+                voice = "bạn muốn nói gì với chatGPT"
+                text_to_speech(voice)
+            else:
+                st.write('Bạn muốn hỏi gì với chatGPT')
+                st.write('Câu hỏi của bạn cho ChatGPT :' + text)
+                voice = chatGPT(text)
+                st.write('ChatGPT trả lời :' + voice)
+                text_to_speech(voice)
