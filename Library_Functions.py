@@ -40,28 +40,28 @@ from time import strftime
 import os
 import warnings
 warnings.filterwarnings("ignore")
-# #---------------------------------------------------------------------------------------------
-# def speech_to_text():
-#     r = sr.Recognizer()
-#     with sr.Microphone() as source:
-#         print("Mời bạn nói: ")
-#         r.adjust_for_ambient_noise(source)
-#         audio = r.listen(source,phrase_time_limit=5)
-#     try:
-#         text = r.recognize_google(audio,language="vi-VI")
-#         print("Bạn -->: {}".format(text))
-#     except:
-#         # print("Xin lỗi! tôi không nhận được giọng nói!")
-#         text="Xin lỗi! tôi không nhận được giọng nói"
-#     return str(text)
-# #---------------------------------------------------------------------------------------------
-# def text_to_speech(text):
-#     output = gTTS(text,lang="vi", slow=False)
-#     date_string = datetime.datetime.now().strftime("%d%m%Y%H%M%S")
-#     filename = "voice"+date_string+".mp3"
-#     output.save(filename)
-#     playsound.playsound(filename)
-#     os.remove(filename)
+#---------------------------------------------------------------------------------------------
+def speech_to_text():
+    r = sr.Recognizer()
+    with sr.Microphone() as source:
+        # print("Mời bạn nói: ")
+        r.adjust_for_ambient_noise(source)
+        audio = r.listen(source,phrase_time_limit=5)
+    try:
+        text = r.recognize_google(audio,language="vi-VI")
+        # print("Bạn -->: {}".format(text))
+    except:
+        # print("Xin lỗi! tôi không nhận được giọng nói!")
+        text="Xin lỗi! tôi không nhận được giọng nói"
+    return str(text)
+#---------------------------------------------------------------------------------------------
+def text_to_speech(text):
+    output = gTTS(text,lang="vi", slow=False)
+    date_string = datetime.datetime.now().strftime("%d%m%Y%H%M%S")
+    filename = "voice"+date_string+".mp3"
+    output.save(filename)
+    playsound.playsound(filename)
+    os.remove(filename)
 #---------------------------------------------------------------------------------------------
 @st.cache_data
 def df():

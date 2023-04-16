@@ -10,5 +10,5 @@ openai
 youtube_search
 webdriver_manager
 selenium
-playsound
+playsound==1.2.2
 gtts
