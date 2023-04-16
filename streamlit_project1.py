@@ -49,7 +49,7 @@ from time import strftime
 #----------------------------------------------------------------------------------------------------
 # 1. Phần chatGPT
 
-#!pip install openai
+!pip install openai
 import openai
 # link tạo API Key đó https://beta.openai.com/account/api-keys
 openai.organization = 'org-Vf0cOHTHl3VyD7bUQSqDmglv'
