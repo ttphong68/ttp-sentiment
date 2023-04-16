@@ -8,7 +8,6 @@ import_ipynb
 statsmodels
 demoji	
 pyvi
-emoji
 speech_recognition
 openai
 youtube_search
