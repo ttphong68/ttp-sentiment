@@ -6,7 +6,6 @@ underthesea
 wordcloud
 import_ipynb
 statsmodels
-demoji	
 speech_recognition
 openai
 youtube_search
