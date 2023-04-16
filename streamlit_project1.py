@@ -44,7 +44,7 @@ import urllib.request as urllib2
 # from selenium.webdriver.common.keys import Keys
 # from webdriver_manager.chrome import ChromeDriverManager
 from time import strftime
-from youtube_search import YoutubeSearch
+# from youtube_search import YoutubeSearch
 
 #----------------------------------------------------------------------------------------------------
 # 1. Phần chatGPT
