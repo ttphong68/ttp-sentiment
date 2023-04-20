@@ -73,6 +73,34 @@ warnings.filterwarnings("ignore")
 # # link lấy Organization ID https://beta.openai.com/account/org-settings
 # openai.api_key = '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'
 #------------------------------------------------------------------------------------------------------------------
+def recognize_speech():
+
+    # Khởi tạo micro
+    r = sr.Recognizer()
+    mic = sr.Microphone()
+
+    with mic as source:
+        # Điều chỉnh độ lớn của micro nếu cần thiết
+        r.adjust_for_ambient_noise(source)
+        st.write("Đang ghi âm...")
+        audio = r.listen(source)
+        st.write("Đã ghi âm xong.")
+    
+    # Lưu file audio vào bộ nhớ tạm (buffer) là một object io.BytesIO
+    audio_file = io.BytesIO(audio.get_raw_data())
+    st.write("Đã lưu file audio vào bộ nhớ tạm.")
+    
+    # Nhận dạng giọng nói và chuyển đổi thành văn bản
+    try:
+        st.write("Đang nhận dạng giọng nói...")
+        text = r.recognize_google(audio, language='vi-VN')
+        # st.write(f"Bạn đã bình luận: {text}")
+    except sr.UnknownValueError:
+        st.write("Không thể nhận dạng giọng nói")
+    except sr.RequestError as e:
+        st.write(f"Lỗi trong quá trình kết nối tới Google Speech Recognition service: {e}")
+    return text  
+#------------------------------------------------------------------------------------------------------------------
 def dung():
     text_to_speech("Hẹn gặp lại bạn sau!")
 #------------------------------------------------------------------------------------------------------------------

@@ -402,48 +402,30 @@ elif choice == 'Dự đoán mới':
 #---------------------------------------------------------------------------------------------
     elif choice == "Bình luận bằng giọng nói" :
         st.write('Bạn chọn bình luận bằng giọng nói')
-        # Lấy danh sách các thiết bị đầu vào âm thanh
+        st.title("Ứng dụng nhận dạng giọng nói")
+        st.write("Bấm vào nút bên dưới và nói vào microphone để bắt đầu.")
 
-        while True: 
-            # try:
-            #     text = nhan_text()
-            # except:
-            #     text = ""
+        # Tạo một nút để kích hoạt hàm recognize_speech()
+        if st.button("Bắt đầu ghi âm"):
+            text = recognize_speech()
+            text_to_speech(text)
 
-            text = nhan_text()
+            # Hiển thị văn bản được chuyển đổi
+            st.write('Câu bình luận của bạn :'+text)
+            # Dự đoán
+            text = text_transform(text)
+            text = tfidf.transform([text])
+            y_predict = model.predict(text)
 
-            if text == "":
-                voice = "Bạn bình luận đi!"
-                st.write(voice)
-                text_to_speech(voice)
-            elif "tên gì" in text:
-                voice = "Tôi là trợ lý ảo"
-                st.write(voice)
-                text_to_speech(voice)
-            elif "là ai" in text:
-                voice = "tôi là trợ lý ảo của anh Phong"
-                st.write(voice)
-                text_to_speech(voice)
-            elif "tạm biệt" in text or "bye" in text or "thoát" in text or "dừng" in text or "tạm dừng" in text or "ngủ thôi" in text:
-                st.write('Hẹn gặp lại bạn sau')
-                dung()
-                break
-            elif "xin lỗi! tôi không nhận được giọng nói" in text:
-                st.write(text)
-                text_to_speech(text)
+            if y_predict[0] == 1:
+                sentiment = 'Tình cảm của bình luận là tích cực'
             else:
-                st.write('Câu bình luận của bạn :'+text)
-                text = text_transform(text)
-                text = tfidf.transform([text])
-                y_predict = model.predict(text)
+                sentiment = 'Tình cảm của bình luận là tiêu cực'
 
-                if y_predict[0] == 1:
-                    sentiment = 'Tình cảm của bình luận là tích cực'
-                else:
-                    sentiment = 'Tình cảm của bình luận là tiêu cực'
+            st.write(sentiment)
+            text_to_speech(sentiment)
+            text_to_speech('Mời bạn nhấn nút Bắt đầu ghi âm để tiếp tục')
 
-                st.write(sentiment)
-                text_to_speech(sentiment)
     # elif choice == "Nói chuyện với chatGPT" :
     #     st.write('Bạn chọn nói chuyện với chatGPT')
     #     while True: 
@@ -478,5 +460,3 @@ elif choice == 'Dự đoán mới':
     #             result= chatGPT(text)
     #             st.write("chatGPT: "+result)
     #             text_to_speech(result)
-
-
