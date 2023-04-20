@@ -73,7 +73,7 @@ warnings.filterwarnings("ignore")
 # # link lấy Organization ID https://beta.openai.com/account/org-settings
 # openai.api_key = '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'
 #------------------------------------------------------------------------------------------------------------------
-def recognize_speech_voice():
+def recognize_speech_voice_old():
     import io
     import wave
     import pyaudio
@@ -123,6 +123,70 @@ def recognize_speech_voice():
         text = r.recognize_google(audio_data, language="vi-VN")  # Nhận dạng giọng nói bằng Google Speech Recognition API (tiếng Việt)
         print(f"Văn bản: {text}")
     return text  
+
+#------------------------------------------------------------------------------------------------------------------    
+
+def recognize_speech_voice_luu():
+    # pip install webrtcvad-wheels
+    # pip install setuptools
+    # pip install sounddevice
+    # pip install webrtcvad
+    
+    import streamlit as st
+    import webrtcvad
+    import pyaudio
+    import speech_recognition as sr
+    import os
+    
+    # set up vad
+    vad = webrtcvad.Vad()
+    vad.set_mode(3)
+    
+    # set up pyaudio
+    audio = pyaudio.PyAudio()
+    stream = audio.open(format=pyaudio.paInt16, channels=1, rate=16000, input=True, frames_per_buffer=960)
+    
+    # set up speech recognition
+    r = sr.Recognizer()
+    
+    audio_data = []
+    
+    while True:
+        try:
+            data = stream.read(960)
+            if vad.is_speech(data):
+                audio_data.append(data)
+        except Exception as e:
+            print(e)
+            break
+    
+    stream.stop_stream()
+    stream.close()
+    audio.terminate()
+    
+    # convert audio to text
+    audio_data = b''.join(audio_data)
+    
+    # write audio data to temporary file
+    with open("temp.wav", "wb") as f:
+        f.write(audio_data)
+    
+    # recognize speech from the temporary file
+    with sr.AudioFile("temp.wav") as source:
+        audio = r.record(source)
+    
+    try:
+        text = r.recognize_google(audio)
+        st.write(f"You said: {text}")
+    except sr.UnknownValueError:
+        st.write("Sorry, I could not understand what you said")
+    except sr.RequestError as e:
+        st.write(f"Sorry, there was an error processing your request: {e}")
+    
+    # delete the temporary file
+    os.remove("temp.wav")
+    return text  
+
 #------------------------------------------------------------------------------------------------------------------
 def dung():
     text_to_speech("Hẹn gặp lại bạn sau!")

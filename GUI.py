@@ -401,13 +401,81 @@ elif choice == 'Dự đoán mới':
                 st.warning("Hãy tải lên một tệp âm thanh để chuyển đổi")
 #---------------------------------------------------------------------------------------------
     elif choice == "Bình luận bằng giọng nói" :
-        st.write('Bạn chọn bình luận bằng giọng nói')
-        st.title("Ứng dụng nhận dạng giọng nói")
-        st.write("Bấm vào nút bên dưới và nói vào microphone để bắt đầu.")
+#----
+#------------------------------------------------------------------------------------------------------------------    
 
-        # Tạo một nút để kích hoạt hàm recognize_speech()
+        import streamlit as st
+        import pyaudio
+        import wave
+        import speech_recognition as sr
+
+        # Ghi âm giọng nói từ microphone
+        def record_audio():
+            CHUNK = 1024
+            FORMAT = pyaudio.paInt16
+            CHANNELS = 1
+            RATE = 16000
+            RECORD_SECONDS = 5
+
+            p = pyaudio.PyAudio()
+
+            stream = p.open(format=FORMAT,
+                            channels=CHANNELS,
+                            rate=RATE,
+                            input=True,
+                            frames_per_buffer=CHUNK)
+
+            st.write("Đang ghi âm...")
+            frames = []
+
+            for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
+                data = stream.read(CHUNK)
+                frames.append(data)
+
+            st.write("Ghi âm hoàn tất.")
+
+            stream.stop_stream()
+            stream.close()
+            p.terminate()
+
+            # Lưu tệp âm thanh đã ghi
+            wf = wave.open("temp.wav", "wb")
+            wf.setnchannels(CHANNELS)
+            wf.setsampwidth(p.get_sample_size(FORMAT))
+            wf.setframerate(RATE)
+            wf.writeframes(b"".join(frames))
+            wf.close()
+
+        # Chuyển đổi tín hiệu âm thanh thành văn bản
+        def transcribe_audio():
+            r = sr.Recognizer()
+
+            with sr.AudioFile("temp.wav") as source:
+                audio = r.record(source)
+
+            try:
+                text = r.recognize_google(audio, language="vi-VN")
+                st.write("Văn bản: {}".format(text))
+            except sr.UnknownValueError:
+                st.write("Không thể nhận dạng giọng nói.")
+            except sr.RequestError as e:
+                st.write("Lỗi khi gửi yêu cầu đến Google Speech Recognition service; {0}".format(e))
+            return text
+        
+        # Tạo nút để bắt đầu ghi âm và chuyển đổi thành văn bản
+        # if st.button("Ghi âm"):
+        #     record_audio()
+        #     transcribe_audio()
+
+        #----
+        # st.write('Bạn chọn bình luận bằng giọng nói')
+        # st.write("Bấm vào nút bên dưới và nói vào microphone để bắt đầu.")
+
+        # # Tạo một nút để kích hoạt hàm recognize_speech()
         if st.button("Bắt đầu ghi âm"):
-            text = recognize_speech_voice()
+            record_audio()
+            text = transcribe_audio()
+            # text = recognize_speech_voice()
             text_to_speech(text)
 
             # Hiển thị văn bản được chuyển đổi
