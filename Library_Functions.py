@@ -74,31 +74,54 @@ warnings.filterwarnings("ignore")
 # openai.api_key = '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'
 #------------------------------------------------------------------------------------------------------------------
 def recognize_speech_voice():
+    import io
+    import wave
+    import pyaudio
 
-    # Khởi tạo micro
+    CHUNK = 1024  # Số lượng frames trong mỗi chunk audio
+    FORMAT = pyaudio.paInt16  # Định dạng âm thanh
+    CHANNELS = 1  # Số kênh (mono)
+    RATE = 44100  # Tốc độ lấy mẫu (samples/second)
+    RECORD_SECONDS = 5  # Thời gian ghi âm (s)
+
+    p = pyaudio.PyAudio()
+
+    # Bắt đầu ghi âm
+    st.write('Bắt đầu ghi âm.... ')
+    stream = p.open(format=FORMAT,
+                    channels=CHANNELS,
+                    rate=RATE,
+                    input=True,
+                    frames_per_buffer=CHUNK)
+
+    frames = []  # List để lưu các chunk audio
+
+    for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
+        data = stream.read(CHUNK)
+        frames.append(data)
+
+    # Kết thúc ghi âm
+    stream.stop_stream()
+    stream.close()
+    p.terminate()
+    st.write('Kết thức ghi âm')
+
+    # Ghi audio data vào một file tạm thời để truyền vào thư viện nhận dạng giọng nói
+    with io.BytesIO() as buffer:
+        wf = wave.open(buffer, 'wb')
+        wf.setnchannels(CHANNELS)
+        wf.setsampwidth(p.get_sample_size(FORMAT))
+        wf.setframerate(RATE)
+        wf.writeframes(b''.join(frames))
+        wf.close()
+        audio_data = buffer.getvalue()
+
+    # Sử dụng thư viện nhận dạng giọng nói để nhận dạng và chuyển đổi thành văn bản
     r = sr.Recognizer()
-    mic = sr.Microphone()
-
-    with mic as source:
-        # Điều chỉnh độ lớn của micro nếu cần thiết
-        r.adjust_for_ambient_noise(source)
-        st.write("Đang ghi âm...")
-        audio = r.listen(source)
-        st.write("Đã ghi âm xong.")
-    
-    # Lưu file audio vào bộ nhớ tạm (buffer) là một object io.BytesIO
-    audio_file = io.BytesIO(audio.get_raw_data())
-    st.write("Đã lưu file audio vào bộ nhớ tạm.")
-    
-    # Nhận dạng giọng nói và chuyển đổi thành văn bản
-    try:
-        st.write("Đang nhận dạng giọng nói...")
-        text = r.recognize_google(audio, language='vi-VN')
-        # st.write(f"Bạn đã bình luận: {text}")
-    except sr.UnknownValueError:
-        st.write("Không thể nhận dạng giọng nói")
-    except sr.RequestError as e:
-        st.write(f"Lỗi trong quá trình kết nối tới Google Speech Recognition service: {e}")
+    with sr.AudioFile(io.BytesIO(audio_data)) as audio_file:
+        audio_data = r.record(audio_file)
+        text = r.recognize_google(audio_data, language="vi-VN")  # Nhận dạng giọng nói bằng Google Speech Recognition API (tiếng Việt)
+        print(f"Văn bản: {text}")
     return text  
 #------------------------------------------------------------------------------------------------------------------
 def dung():
