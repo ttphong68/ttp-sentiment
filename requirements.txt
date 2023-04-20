@@ -16,4 +16,3 @@ pyvi
 emoji
 imblearn
 wave
-pygobject
