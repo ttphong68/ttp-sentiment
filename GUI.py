@@ -421,9 +421,13 @@ elif choice == 'Dự đoán mới':
             audio = pyaudio.PyAudio()
 
             # start Recording
+            # stream = audio.open(format=FORMAT, channels=CHANNELS,
+            #                 rate=RATE, input=True,
+            #                 frames_per_buffer=CHUNK)
             stream = audio.open(format=FORMAT, channels=CHANNELS,
-                            rate=RATE, input=True,
-                            frames_per_buffer=CHUNK)
+                rate=RATE, input=True, input_device_index=1,
+                frames_per_buffer=CHUNK)
+
             st.write("Recording...")
             frames = []
 
