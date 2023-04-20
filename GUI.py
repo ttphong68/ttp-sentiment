@@ -407,7 +407,7 @@ elif choice == 'Dự đoán mới':
 
         # Tạo một nút để kích hoạt hàm recognize_speech()
         if st.button("Bắt đầu ghi âm"):
-            text = recognize_speech()
+            text = recognize_speech_voice()
             text_to_speech(text)
 
             # Hiển thị văn bản được chuyển đổi

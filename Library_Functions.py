@@ -73,7 +73,7 @@ warnings.filterwarnings("ignore")
 # # link lấy Organization ID https://beta.openai.com/account/org-settings
 # openai.api_key = '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'
 #------------------------------------------------------------------------------------------------------------------
-def recognize_speech():
+def recognize_speech_voice():
 
     # Khởi tạo micro
     r = sr.Recognizer()
