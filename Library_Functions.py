@@ -66,12 +66,6 @@ import urllib.request as urllib2
 
 import warnings
 warnings.filterwarnings("ignore")
-#----------------------------------------------------------------------------------------------------
-# import openai
-# # link tạo API Key đó https://beta.openai.com/account/api-keys
-# openai.organization = 'org-Vf0cOHTHl3VyD7bUQSqDmglv'
-# # link lấy Organization ID https://beta.openai.com/account/org-settings
-# openai.api_key = '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'
 #------------------------------------------------------------------------------------------------------------------
 def recognize_speech_voice_old():
     import io
